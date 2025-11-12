@@ -1,0 +1,20 @@
+# Gradle
+.gradle/
+build/
+**/build/
+
+# Local configuration
+local.properties
+*.iml
+/.idea/
+
+# Android
+/.gradle
+/captures/
+outputs/
+
+# Kotlin
+*.kts
+
+# Misc
+*.log

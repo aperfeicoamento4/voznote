@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.bsbchurch.voznote">
+
+    <!-- Permissões necessárias -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <application
+        android:name="com.bsbchurch.voznote.VozNoteApp"
+        android:allowBackup="true"
+        android:label="VozNote"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.VozNote">
+
+        <activity android:name="com.bsbchurch.voznote.NotasActivity" />
+        <activity android:name="com.bsbchurch.voznote.GravacaoActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Receiver para Alarmes -->
+        <receiver android:name="com.bsbchurch.voznote.receiver.AlarmeReceiver" />
+
+    </application>
+
+</manifest>

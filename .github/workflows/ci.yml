@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Verificar estrutura e tentar build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Listar arquivos do projeto (árvore)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tree
+          echo "=== Estrutura do repositório (limite 3 níveis) ==="
+          tree -a -I '.gradle|build|*.iml|local.properties' -L 3 || true
+
+      - name: Tentar build com Gradle Wrapper (se existir)
+        run: |
+          if [ -x ./gradlew ]; then
+            echo "Gradle wrapper encontrado: executando assembleDebug"
+            ./gradlew clean assembleDebug --no-daemon
+          else
+            echo "Gradle wrapper não encontrado. Abra o projeto no Android Studio e gere o wrapper (Menu > File > Settings > Gradle > Use gradle 'wrapper') ou rode 'gradle wrapper' localmente. Pulando etapa de build."
+          fi

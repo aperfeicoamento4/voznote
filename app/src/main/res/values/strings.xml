@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VozNote</string>
+    <string name="acao_gravar">Gravar</string>
+    <string name="acao_parar">Parar</string>
+    <string name="acao_cancelar">Cancelar</string>
+    <string name="minhas_notas">Minhas Notas</string>
+</resources>
