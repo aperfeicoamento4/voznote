@@ -60,6 +60,11 @@ class GravacaoActivity : AppCompatActivity() {
         }
 
         // Ações dos FABs
+        // Ajusta ícones iniciais
+        binding.fabPauseRec.setImageResource(R.drawable.ic_pause)
+        binding.fabStop.setImageResource(R.drawable.ic_stop)
+        binding.fabCancel.setImageResource(R.drawable.ic_close)
+
         binding.fabPauseRec.setOnClickListener {
             try {
                 val gravando = viewModel.gravando.value ?: false
@@ -68,20 +73,20 @@ class GravacaoActivity : AppCompatActivity() {
                     // iniciar gravação
                     viewModel.iniciarManager(this)
                     viewModel.iniciarGravacao()
-                    binding.fabPauseRec.setImageResource(android.R.drawable.ic_media_pause)
-                    Toast.makeText(this, "Gravação iniciada", Toast.LENGTH_SHORT).show()
-                    Timber.i("Usuário iniciou gravação")
+                    binding.fabPauseRec.setImageResource(R.drawable.ic_pause)
+                    Toast.makeText(this, "Captação iniciada", Toast.LENGTH_SHORT).show()
+                    Timber.i("Usuário iniciou captação")
                 } else {
                     if (!pausado) {
                         viewModel.pausar()
-                        binding.fabPauseRec.setImageResource(android.R.drawable.ic_media_play)
-                        Toast.makeText(this, "Gravação pausada", Toast.LENGTH_SHORT).show()
-                        Timber.i("Usuário pausou gravação")
+                        binding.fabPauseRec.setImageResource(R.drawable.ic_mic)
+                        Toast.makeText(this, "Captação pausada", Toast.LENGTH_SHORT).show()
+                        Timber.i("Usuário pausou captação")
                     } else {
                         viewModel.retomar()
-                        binding.fabPauseRec.setImageResource(android.R.drawable.ic_media_pause)
-                        Toast.makeText(this, "Gravação retomada", Toast.LENGTH_SHORT).show()
-                        Timber.i("Usuário retomou gravação")
+                        binding.fabPauseRec.setImageResource(R.drawable.ic_pause)
+                        Toast.makeText(this, "Captação retomada", Toast.LENGTH_SHORT).show()
+                        Timber.i("Usuário retomou captação")
                     }
                 }
             } catch (e: Exception) {
@@ -92,17 +97,16 @@ class GravacaoActivity : AppCompatActivity() {
 
         binding.fabStop.setOnClickListener {
             try {
-                val caminho = viewModel.pararESalvar()
-                if (caminho != null) {
-                    Toast.makeText(this, "Gravação salva: $caminho", Toast.LENGTH_LONG).show()
-                    Timber.i("Gravação salva em: %s", caminho)
-                    // Aqui deve-se criar a Nota no banco Room. Por ora, apenas navega para Notas.
+                val salvo = viewModel.pararESalvar()
+                if (salvo) {
+                    Toast.makeText(this, "Nota salva", Toast.LENGTH_LONG).show()
+                    Timber.i("Nota de texto salva")
                 } else {
-                    Toast.makeText(this, "Nenhum arquivo para salvar", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Nenhuma transcrição para salvar", Toast.LENGTH_SHORT).show()
                 }
                 startActivity(Intent(this, NotasActivity::class.java))
             } catch (e: Exception) {
-                Timber.e(e, "Erro ao parar gravação")
+                Timber.e(e, "Erro ao parar captação")
                 Toast.makeText(this, "Erro ao parar: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
@@ -110,11 +114,12 @@ class GravacaoActivity : AppCompatActivity() {
         binding.fabCancel.setOnClickListener {
             try {
                 viewModel.cancelar()
-                Toast.makeText(this, "Gravação cancelada", Toast.LENGTH_SHORT).show()
-                Timber.i("Usuário cancelou gravação")
+                // limpar texto exibido
+                Toast.makeText(this, "Captação cancelada", Toast.LENGTH_SHORT).show()
+                Timber.i("Usuário cancelou captação")
                 startActivity(Intent(this, NotasActivity::class.java))
             } catch (e: Exception) {
-                Timber.e(e, "Erro ao cancelar gravação")
+                Timber.e(e, "Erro ao cancelar captação")
                 Toast.makeText(this, "Erro ao cancelar: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
@@ -128,5 +133,8 @@ class GravacaoActivity : AppCompatActivity() {
         // Inicializa o manager no ViewModel para resolver recursos dependentes do contexto
         viewModel.iniciarManager(this)
         binding.textoTranscricao.text = "Transcrição em tempo real aparecerá aqui..."
+        // Iniciar captura automaticamente ao abrir
+        viewModel.iniciarGravacao()
+        binding.fabPauseRec.setImageResource(R.drawable.ic_pause)
     }
 }

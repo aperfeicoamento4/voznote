@@ -60,42 +60,40 @@ class GravacaoViewModel : ViewModel() {
         _pausado.value = false
     }
 
-    fun pararESalvar(): String? {
-        val caminho = manager?.pararESalvar()
+    fun pararESalvar(): Boolean {
+        manager?.pararESalvar()
         _gravando.value = false
         _pausado.value = false
 
-        // Salvar nota em background se houver texto ou arquivo
+        // Salvar nota em background apenas se houver texto
         val textoAtual = _transcricao.value?.trim() ?: ""
-        if (textoAtual.isNotBlank() || caminho != null) {
+        if (textoAtual.isNotBlank()) {
             val nota = Nota(
-                texto = textoAtual.ifBlank { "Nota de voz" },
-                caminhoAudio = caminho,
+                texto = textoAtual,
+                caminhoAudio = null,
                 dataHora = System.currentTimeMillis(),
                 corFundo = gerarCorPastel(),
                 ordem = 0
             )
-            try {
-                val ctx = appContext
-                if (ctx != null) {
-                    viewModelScope.launch {
-                        try {
-                            val repo = NotaRepository.obter(ctx)
-                            val id = repo.inserir(nota)
-                            Timber.i("Nota inserida com id %s", id)
-                        } catch (e: Exception) {
-                            Timber.e(e, "Erro ao inserir nota")
-                        }
+            val ctx = appContext
+            if (ctx != null) {
+                viewModelScope.launch {
+                    try {
+                        val repo = NotaRepository.obter(ctx)
+                        val id = repo.inserir(nota)
+                        Timber.i("Nota inserida com id %s", id)
+                        // limpar transcrição atual após salvar
+                        _transcricao.postValue("")
+                    } catch (e: Exception) {
+                        Timber.e(e, "Erro ao inserir nota")
                     }
-                } else {
-                    Timber.w("Contexto da app não disponível para salvar nota")
                 }
-            } catch (e: Exception) {
-                Timber.e(e, "Falha ao agendar persistência da nota")
+            } else {
+                Timber.w("Contexto da app não disponível para salvar nota")
             }
+            return true
         }
-
-        return caminho
+        return false
     }
 
     fun cancelar() {

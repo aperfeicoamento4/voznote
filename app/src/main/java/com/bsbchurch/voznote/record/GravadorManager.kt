@@ -26,8 +26,6 @@ import android.media.MediaRecorder
  */
 class GravadorManager(private val contexto: Context) {
 
-    private var mediaRecorder: MediaRecorder? = null
-    private var outputFile: String? = null
     private var speechRecognizer: SpeechRecognizer? = null
     private var listening = false
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
@@ -36,86 +34,49 @@ class GravadorManager(private val contexto: Context) {
     var onTranscricao: ((String) -> Unit)? = null
     var onErro: ((String) -> Unit)? = null
 
-    // Gera caminho de arquivo para salvar a gravação
-    private fun gerarArquivoAudio(): String {
-        val pasta = contexto.getExternalFilesDir(Environment.DIRECTORY_MUSIC)
-            ?: contexto.filesDir
-        val sdf = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
-        val nome = "voznote_${sdf.format(Date())}.m4a"
-        return File(pasta, nome).absolutePath
-    }
-
+    /**
+     * Inicia apenas o SpeechRecognizer para obter transcrição em tempo real.
+     */
     fun iniciarGravacao() {
         try {
-            outputFile = gerarArquivoAudio()
-            mediaRecorder = MediaRecorder().apply {
-                setAudioSource(MediaRecorder.AudioSource.MIC)
-                setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-                setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-                setAudioSamplingRate(44100)
-                setAudioEncodingBitRate(192000)
-                setOutputFile(outputFile)
-                prepare()
-                start()
-            }
-            Timber.i("Gravação iniciada: %s", outputFile)
             iniciarSpeechRecognizer()
         } catch (e: Exception) {
-            Timber.e(e, "Erro ao iniciar gravação")
-            onErro?.invoke("Erro ao iniciar gravação: ${e.message}")
+            Timber.e(e, "Erro ao iniciar reconhecimento de voz")
+            onErro?.invoke("Erro ao iniciar reconhecimento: ${e.message}")
         }
     }
 
     fun pausarGravacao() {
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                mediaRecorder?.pause()
-                Timber.i("Gravação pausada")
-            } else {
-                Timber.w("Paussa não suportada nesta API")
-                onErro?.invoke("Pausa não suportada nesta versão do Android")
-            }
             pararSpeechRecognizer()
+            Timber.i("Captura pausada")
         } catch (e: Exception) {
-            Timber.e(e, "Erro ao pausar gravação")
+            Timber.e(e, "Erro ao pausar captura")
             onErro?.invoke("Erro ao pausar: ${e.message}")
         }
     }
 
     fun retomarGravacao() {
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                mediaRecorder?.resume()
-                Timber.i("Gravação retomada")
-            } else {
-                Timber.w("Resume não suportado nesta API")
-                onErro?.invoke("Retomar não suportado nesta versão do Android")
-            }
             iniciarSpeechRecognizer()
+            Timber.i("Captura retomada")
         } catch (e: Exception) {
-            Timber.e(e, "Erro ao retomar gravação")
+            Timber.e(e, "Erro ao retomar captura")
             onErro?.invoke("Erro ao retomar: ${e.message}")
         }
     }
 
+    /**
+     * Para o reconhecimento e retorna null (não há arquivo de áudio).
+     */
     fun pararESalvar(): String? {
         try {
             pararSpeechRecognizer()
-            mediaRecorder?.apply {
-                try {
-                    stop()
-                } catch (e: Exception) {
-                    Timber.w(e, "stop() lançou exceção, ignorando")
-                }
-                reset()
-                release()
-            }
-            mediaRecorder = null
-            Timber.i("Gravação parada e salva: %s", outputFile)
-            return outputFile
+            Timber.i("Captura parada (texto salvo pela camada superior)")
+            return null
         } catch (e: Exception) {
-            Timber.e(e, "Erro ao parar e salvar")
-            onErro?.invoke("Erro ao parar gravação: ${e.message}")
+            Timber.e(e, "Erro ao parar captura")
+            onErro?.invoke("Erro ao parar: ${e.message}")
             return null
         }
     }
@@ -123,20 +84,10 @@ class GravadorManager(private val contexto: Context) {
     fun cancelarGravacao() {
         try {
             pararSpeechRecognizer()
-            mediaRecorder?.apply {
-                try { stop() } catch (_: Exception){}
-                reset()
-                release()
-            }
-            mediaRecorder = null
-            outputFile?.let {
-                try { File(it).delete() } catch (_: Exception){}
-            }
-            outputFile = null
-            Timber.i("Gravação cancelada e arquivo excluído se existia")
+            Timber.i("Captura cancelada")
         } catch (e: Exception) {
-            Timber.e(e, "Erro ao cancelar gravação")
-            onErro?.invoke("Erro ao cancelar gravação: ${e.message}")
+            Timber.e(e, "Erro ao cancelar captura")
+            onErro?.invoke("Erro ao cancelar: ${e.message}")
         }
     }
 

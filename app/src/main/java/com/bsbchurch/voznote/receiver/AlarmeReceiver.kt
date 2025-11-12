@@ -37,11 +37,8 @@ class AlarmeReceiver : BroadcastReceiver() {
             ).apply {
                 description = "Notificações de lembretes do VozNote"
                 lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
-                val audioAttrs = AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                    .build()
-                setSound(null, audioAttrs)
+                // Use default notification sound
+                setSound(android.provider.Settings.System.DEFAULT_NOTIFICATION_URI, null)
             }
             nm.createNotificationChannel(channel)
         }
@@ -61,6 +58,10 @@ class AlarmeReceiver : BroadcastReceiver() {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setAutoCancel(true)
             .setContentIntent(pending)
+        // Para Android < O, garantir som padrão
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O) {
+            builder.setDefaults(android.app.Notification.DEFAULT_ALL)
+        }
 
         with(NotificationManagerCompat.from(context)) {
             notify(notaId.takeIf { it != 0 } ?: System.currentTimeMillis().toInt(), builder.build())
