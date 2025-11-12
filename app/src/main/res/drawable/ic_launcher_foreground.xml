@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Forma simples representando um microfone (foreground branco) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,30a12,12 0 1,0 0,24a12,12 0 1,0 0,-24zM66,54v6a18,18 0 0,1-36,0v-6"
+        />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M48,72h12v6H48z" />
+</vector>
