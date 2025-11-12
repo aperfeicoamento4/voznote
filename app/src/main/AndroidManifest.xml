@@ -17,7 +17,8 @@
         android:theme="@style/Theme.VozNote">
 
         <activity android:name="com.bsbchurch.voznote.NotasActivity" />
-        <activity android:name="com.bsbchurch.voznote.GravacaoActivity">
+        <activity android:name="com.bsbchurch.voznote.GravacaoActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
