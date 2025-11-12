@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.bsbchurch.voznote.databinding.ActivityGravacaoBinding
+import com.bsbchurch.voznote.notas.NotasActivity
 import com.bsbchurch.voznote.record.GravacaoViewModel
 import timber.log.Timber
 
