@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:layout_gravity="bottom|start"
-            app:srcCompat="@android:drawable/ic_media_pause" />
+            app:srcCompat="@drawable/ic_pause" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_stop"
@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:layout_gravity="bottom|center"
-            app:srcCompat="@android:drawable/ic_media_stop" />
+            app:srcCompat="@drawable/ic_stop" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_cancel"
@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:layout_gravity="bottom|end"
-            app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
+            app:srcCompat="@drawable/ic_close" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_notas"
@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="24dp"
             android:layout_gravity="bottom|end"
-            app:srcCompat="@android:drawable/ic_menu_agenda" />
+            app:srcCompat="@drawable/ic_mic" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
