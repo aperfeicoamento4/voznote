@@ -16,6 +16,8 @@ android {
         versionName '1.0'
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        // Habilita suporte a Vector Drawables em versões antigas via AppCompat
+        vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
