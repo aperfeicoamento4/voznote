@@ -2,6 +2,9 @@ package com.bsbchurch.voznote.notas
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -60,7 +63,7 @@ class NotasAdapter(
 
         holder.btnMenu.setOnClickListener { v ->
             val popup = PopupMenu(contexto, v)
-            popup.menu.add("Editar")
+            // Removido item "Editar" conforme pedido do usuário
             popup.menu.add("Excluir")
             popup.menu.add("Configurar Alarme")
             popup.setOnMenuItemClickListener { item: MenuItem ->
@@ -77,6 +80,45 @@ class NotasAdapter(
         holder.itemView.setOnClickListener {
             Timber.d("Nota clicada: %s", nota.id)
             listener.onAbrir(nota)
+        }
+
+        // Mostrar somente até 3 linhas com reticências coloridas ligeiramente mais escuras que o fundo
+        try {
+            val textoCompleto = nota.texto ?: ""
+            val maxChars = 120 // heurística para aproximar 3 linhas (ajustável)
+            if (textoCompleto.length > maxChars) {
+                // corta respeitando última palavra
+                var corte = textoCompleto.substring(0, maxChars)
+                val lastSpace = corte.lastIndexOf(' ')
+                if (lastSpace > 0) corte = corte.substring(0, lastSpace)
+                val sb = SpannableStringBuilder()
+                sb.append(corte)
+                // criar reticências com cor derivada da cor de fundo (um pouco mais escura)
+                val corFundo = nota.corFundo
+                val corEllipsis = try {
+                    // escurece a cor de fundo
+                    val r = ((corFundo shr 16) and 0xFF)
+                    val g = ((corFundo shr 8) and 0xFF)
+                    val b = (corFundo and 0xFF)
+                    val factor = 0.7f
+                    val dr = (r * factor).toInt().coerceIn(0,255)
+                    val dg = (g * factor).toInt().coerceIn(0,255)
+                    val db = (b * factor).toInt().coerceIn(0,255)
+                    (0xFF shl 24) or (dr shl 16) or (dg shl 8) or db
+                } catch (e: Exception) {
+                    0xFF444444.toInt()
+                }
+                val ell = "..."
+                val start = sb.length
+                sb.append(ell)
+                sb.setSpan(ForegroundColorSpan(corEllipsis), start, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                holder.texto.text = sb
+            } else {
+                holder.texto.text = textoCompleto
+            }
+        } catch (e: Exception) {
+            Timber.w(e, "Erro ao truncar texto da nota")
+            holder.texto.text = nota.texto
         }
     }
 

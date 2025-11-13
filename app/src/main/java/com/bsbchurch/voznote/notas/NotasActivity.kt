@@ -78,6 +78,12 @@ class NotasActivity : AppCompatActivity(), NotasAdapter.Callback {
         carregarNotas()
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Recarregar notas ao voltar para a tela para refletir edições
+        carregarNotas()
+    }
+
     private fun carregarNotas() {
         lifecycleScope.launch {
             val notas = repo.listarTodas()
