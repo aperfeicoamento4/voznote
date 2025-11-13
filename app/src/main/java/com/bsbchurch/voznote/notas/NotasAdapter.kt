@@ -20,7 +20,8 @@ import timber.log.Timber
 class NotasAdapter(
     private val contexto: Context,
     private val lista: MutableList<Nota>,
-    private val listener: Callback
+    private val listener: Callback,
+    private var mostrarBordas: Boolean = false
 ) : RecyclerView.Adapter<NotasAdapter.NotaViewHolder>() {
 
     interface Callback {
@@ -45,9 +46,31 @@ class NotasAdapter(
         val nota = lista[position]
         holder.texto.text = nota.texto
         try {
-            holder.itemView.setBackgroundColor(nota.corFundo)
+            // Usar um drawable para permitir bordas quando habilitado
+            val gd = android.graphics.drawable.GradientDrawable()
+            gd.cornerRadius = 12 * contexto.resources.displayMetrics.density
+            gd.setColor(nota.corFundo)
+            if (mostrarBordas) {
+                try {
+                    val corFundo = nota.corFundo
+                    val r = ((corFundo shr 16) and 0xFF)
+                    val g = ((corFundo shr 8) and 0xFF)
+                    val b = (corFundo and 0xFF)
+                    val factor = 0.7f
+                    val dr = (r * factor).toInt().coerceIn(0,255)
+                    val dg = (g * factor).toInt().coerceIn(0,255)
+                    val db = (b * factor).toInt().coerceIn(0,255)
+                    val corBorda = (0xFF shl 24) or (dr shl 16) or (dg shl 8) or db
+                    val strokePx = (2 * contexto.resources.displayMetrics.density).toInt()
+                    gd.setStroke(strokePx, corBorda)
+                } catch (e: Exception) {
+                    gd.setStroke((2 * contexto.resources.displayMetrics.density).toInt(), 0xFF444444.toInt())
+                }
+            }
+            holder.itemView.background = gd
         } catch (e: Exception) {
-            Timber.w(e, "Erro ao aplicar cor de fundo")
+            Timber.w(e, "Erro ao aplicar cor de fundo/borda")
+            holder.itemView.setBackgroundColor(nota.corFundo)
         }
 
         // Mostrar info de alarme se presente (formato dd-MM-yyyy HH:mm)
@@ -138,6 +161,11 @@ class NotasAdapter(
     fun updateList(nova: List<Nota>) {
         lista.clear()
         lista.addAll(nova)
+        notifyDataSetChanged()
+    }
+
+    fun setMostrarBordas(mostrar: Boolean) {
+        mostrarBordas = mostrar
         notifyDataSetChanged()
     }
 

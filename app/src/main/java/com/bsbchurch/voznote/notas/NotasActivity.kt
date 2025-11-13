@@ -19,6 +19,7 @@ import com.bsbchurch.voznote.databinding.ActivityNotasBinding
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
+import android.content.Context
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -44,7 +45,9 @@ class NotasActivity : AppCompatActivity(), NotasAdapter.Callback {
 
         repo = NotaRepository.obter(this)
 
-        adapter = NotasAdapter(this, mutableListOf(), this)
+        val prefs = getSharedPreferences("voznote_prefs", Context.MODE_PRIVATE)
+        val mostrarBordas = prefs.getBoolean("pref_bordas", false)
+        adapter = NotasAdapter(this, mutableListOf(), this, mostrarBordas)
         binding.recyclerNotas.layoutManager = LinearLayoutManager(this)
         binding.recyclerNotas.adapter = adapter
 
@@ -89,6 +92,14 @@ class NotasActivity : AppCompatActivity(), NotasAdapter.Callback {
             com.bsbchurch.voznote.record.GravadorManager.pararGlobal()
         } catch (e: Exception) {
             Timber.w(e, "Erro ao parar reconhecimento global ao entrar em NotasActivity")
+        }
+        // Atualizar estado de bordas a cada retorno, caso o usuário mude em Configurações
+        try {
+            val prefs2 = getSharedPreferences("voznote_prefs", Context.MODE_PRIVATE)
+            val mostrar = prefs2.getBoolean("pref_bordas", false)
+            adapter.setMostrarBordas(mostrar)
+        } catch (e: Exception) {
+            Timber.w(e, "Erro ao aplicar pref de bordas")
         }
     }
 
@@ -176,6 +187,12 @@ class NotasActivity : AppCompatActivity(), NotasAdapter.Callback {
                 val cal = Calendar.getInstance()
                 cal.set(ano, mes, dia, hora, minuto, 0)
                 val millis = cal.timeInMillis
+                // Validação: não permitir agendar no passado ou tempo muito próximo
+                val agora = System.currentTimeMillis()
+                if (millis <= agora + 10_000) {
+                    Toast.makeText(this, "Escolha um horário futuro (pelo menos 10 segundos à frente)", Toast.LENGTH_LONG).show()
+                    return@TimePickerDialog
+                }
                 // Escolher recorrência simples
                 val opcoes = arrayOf("Nenhuma", "Diária", "Semanal")
                 AlertDialog.Builder(this)
