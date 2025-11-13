@@ -18,6 +18,7 @@
 
         <activity android:name="com.bsbchurch.voznote.notas.NotasActivity" android:exported="false" />
         <activity android:name="com.bsbchurch.voznote.notas.NotaDetalheActivity" android:exported="false" />
+        <activity android:name="com.bsbchurch.voznote.notas.ConfiguracoesActivity" android:exported="false" />
         <activity android:name="com.bsbchurch.voznote.GravacaoActivity"
             android:exported="true">
             <intent-filter>

@@ -48,14 +48,7 @@ class NotasActivity : AppCompatActivity(), NotasAdapter.Callback {
         binding.recyclerNotas.layoutManager = LinearLayoutManager(this)
         binding.recyclerNotas.adapter = adapter
 
-        // Ação do botão de configurações (ainda sem tela específica)
-        try {
-            binding.btnConfig.setOnClickListener {
-                Toast.makeText(this, "Configurações (em breve)", Toast.LENGTH_SHORT).show()
-            }
-        } catch (e: Exception) {
-            Timber.w(e, "btnConfig não encontrado no layout")
-        }
+        // A engrenagem foi movida para a app bar (menu). Veja onCreateOptionsMenu.
 
         val touchHelper = ItemTouchHelper(object : ItemTouchHelper.Callback() {
             override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
@@ -96,6 +89,22 @@ class NotasActivity : AppCompatActivity(), NotasAdapter.Callback {
             com.bsbchurch.voznote.record.GravadorManager.pararGlobal()
         } catch (e: Exception) {
             Timber.w(e, "Erro ao parar reconhecimento global ao entrar em NotasActivity")
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: android.view.Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_notas, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_settings -> {
+                // Abrir tela de configurações (placeholder)
+                startActivity(Intent(this, ConfiguracoesActivity::class.java))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

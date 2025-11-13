@@ -54,7 +54,7 @@ class NotasAdapter(
         if (nota.alarmeMillis != null && nota.alarmeMillis!! > 0) {
             val cal = java.util.Calendar.getInstance()
             cal.timeInMillis = nota.alarmeMillis!!
-            val sdf = java.text.SimpleDateFormat("dd-MM-yyyy HH:mm", java.util.Locale.getDefault())
+            val sdf = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault())
             val txt = "🔔 ${sdf.format(java.util.Date(cal.timeInMillis))}"
             holder.alarmInfo.text = txt
             holder.alarmInfo.visibility = View.VISIBLE
