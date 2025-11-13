@@ -17,6 +17,8 @@ class NotaRepository private constructor(context: Context) {
 
     suspend fun deletar(nota: Nota) = dao.deletar(nota)
 
+    suspend fun buscarPorId(id: Int): Nota? = dao.buscarPorId(id)
+
     suspend fun atualizarOrdem(id: Int, ordem: Int) = dao.atualizarOrdem(id, ordem)
 
     companion object {

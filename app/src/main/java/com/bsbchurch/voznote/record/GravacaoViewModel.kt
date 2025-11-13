@@ -29,14 +29,29 @@ class GravacaoViewModel : ViewModel() {
 
     private var manager: GravadorManager? = null
     private var appContext: Context? = null
+    private val acumulado = StringBuilder()
 
     fun iniciarManager(context: Context) {
         if (manager == null) {
             manager = GravadorManager(context.applicationContext)
             appContext = context.applicationContext
-            manager?.onTranscricao = { texto ->
-                Timber.d("ViewModel recebeu transcrição: %s", texto)
-                _transcricao.postValue(texto)
+            manager?.onTranscricao = { texto, isFinal ->
+                try {
+                    if (isFinal) {
+                        // resultado final: acrescenta ao acumulado
+                        if (texto.isNotBlank()) {
+                            if (acumulado.isNotEmpty()) acumulado.append(' ')
+                            acumulado.append(texto.trim())
+                        }
+                        _transcricao.postValue(acumulado.toString())
+                    } else {
+                        // parcial: mostra acumulado + parcial
+                        val parcial = if (acumulado.isNotEmpty()) "${acumulado} ${texto.trim()}" else texto.trim()
+                        _transcricao.postValue(parcial)
+                    }
+                } catch (e: Exception) {
+                    Timber.w(e, "Erro ao processar transcrição parcial/final")
+                }
             }
             manager?.onErro = { erro ->
                 Timber.w("Erro no GravadorManager: %s", erro)
@@ -64,9 +79,8 @@ class GravacaoViewModel : ViewModel() {
         manager?.pararESalvar()
         _gravando.value = false
         _pausado.value = false
-
-        // Salvar nota em background apenas se houver texto
-        val textoAtual = _transcricao.value?.trim() ?: ""
+        // Salvar nota em background apenas se houver texto acumulado
+        val textoAtual = acumulado.toString().trim()
         if (textoAtual.isNotBlank()) {
             val nota = Nota(
                 texto = textoAtual,
@@ -83,6 +97,7 @@ class GravacaoViewModel : ViewModel() {
                         val id = repo.inserir(nota)
                         Timber.i("Nota inserida com id %s", id)
                         // limpar transcrição atual após salvar
+                        acumulado.clear()
                         _transcricao.postValue("")
                     } catch (e: Exception) {
                         Timber.e(e, "Erro ao inserir nota")
@@ -100,6 +115,8 @@ class GravacaoViewModel : ViewModel() {
         manager?.cancelarGravacao()
         _gravando.value = false
         _pausado.value = false
+        acumulado.clear()
+        _transcricao.postValue("")
     }
 
     override fun onCleared() {

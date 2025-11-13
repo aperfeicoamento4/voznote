@@ -22,7 +22,6 @@ Arquivos criados/atualizados nesta etapa:
 - `app/src/main/res/values/colors.xml` - cores básicas.
 - `app/src/main/res/values/themes.xml` - tema simples de Material.
 
-Próximo passo: implementar gravação de áudio, permissões e transcrição em tempo real (Etapa 2).
 
 Instruções rápidas:
 

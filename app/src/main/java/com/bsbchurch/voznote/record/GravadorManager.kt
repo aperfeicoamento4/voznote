@@ -31,7 +31,8 @@ class GravadorManager(private val contexto: Context) {
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
 
     // Live callback simples via lambda
-    var onTranscricao: ((String) -> Unit)? = null
+    // segundo parâmetro indica se é um resultado final (true) ou parcial (false)
+    var onTranscricao: ((String, Boolean) -> Unit)? = null
     var onErro: ((String) -> Unit)? = null
 
     /**
@@ -122,7 +123,7 @@ class GravadorManager(private val contexto: Context) {
                         val texts = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                         val t = texts?.joinToString(" ") ?: ""
                         Timber.d("SpeechRecognizer resultados: %s", t)
-                        if (t.isNotBlank()) onTranscricao?.invoke(t)
+                        if (t.isNotBlank()) onTranscricao?.invoke(t, true)
                         // Continuar escutando
                         if (listening) iniciarListening()
                     }
@@ -130,7 +131,7 @@ class GravadorManager(private val contexto: Context) {
                     override fun onPartialResults(partialResults: Bundle?) {
                         val texts = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                         val t = texts?.joinToString(" ") ?: ""
-                        if (t.isNotBlank()) onTranscricao?.invoke(t)
+                        if (t.isNotBlank()) onTranscricao?.invoke(t, false)
                     }
 
                     override fun onEvent(eventType: Int, params: Bundle?) {}

@@ -23,6 +23,7 @@ class NotasAdapter(
     interface Callback {
         fun onEditar(nota: Nota)
         fun onExcluir(nota: Nota)
+        fun onAbrir(nota: Nota)
         fun onConfigurarAlarme(nota: Nota)
     }
 
@@ -71,6 +72,11 @@ class NotasAdapter(
                 true
             }
             popup.show()
+        }
+        // Clique no item abre a nota em tela cheia
+        holder.itemView.setOnClickListener {
+            Timber.d("Nota clicada: %s", nota.id)
+            listener.onAbrir(nota)
         }
     }
 

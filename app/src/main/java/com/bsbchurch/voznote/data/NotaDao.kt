@@ -7,6 +7,9 @@ interface NotaDao {
     @Query("SELECT * FROM nota ORDER BY ordem ASC, dataHora DESC")
     suspend fun listarTodas(): List<Nota>
 
+    @Query("SELECT * FROM nota WHERE id = :id LIMIT 1")
+    suspend fun buscarPorId(id: Int): Nota?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun inserir(nota: Nota): Long
 

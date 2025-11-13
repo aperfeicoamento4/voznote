@@ -116,6 +116,17 @@ class NotasActivity : AppCompatActivity(), NotasAdapter.Callback {
             .show()
     }
 
+    override fun onAbrir(nota: Nota) {
+        // Abre a activity de detalhe/edição completa
+        try {
+            val intent = Intent(this, NotaDetalheActivity::class.java)
+            intent.putExtra("notaId", nota.id)
+            startActivity(intent)
+        } catch (e: Exception) {
+            Timber.e(e, "Erro ao abrir detalhe da nota")
+        }
+    }
+
     override fun onExcluir(nota: Nota) {
         AlertDialog.Builder(this)
             .setTitle("Excluir nota")
