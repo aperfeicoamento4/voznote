@@ -26,6 +26,24 @@ import android.media.MediaRecorder
  */
 class GravadorManager(private val contexto: Context) {
 
+    companion object {
+        // Instância ativa (se houver) para permitir parar globalmente quando necessário
+        @Volatile
+        private var instanciaAtiva: GravadorManager? = null
+
+        fun pararGlobal() {
+            try {
+                instanciaAtiva?.let {
+                    it.pararSpeechRecognizer()
+                    instanciaAtiva = null
+                    Timber.i("GravadorManager: parada global executada")
+                }
+            } catch (e: Exception) {
+                Timber.w(e, "Erro ao parar globalmente GravadorManager")
+            }
+        }
+    }
+
     private var speechRecognizer: SpeechRecognizer? = null
     private var listening = false
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
@@ -138,6 +156,8 @@ class GravadorManager(private val contexto: Context) {
                 }
                 speechRecognizer?.setRecognitionListener(listener)
                 listening = true
+                // registra instância ativa
+                instanciaAtiva = this
                 iniciarListening()
             } else {
                 onErro?.invoke("Reconhecimento de voz não disponível neste dispositivo")
@@ -172,6 +192,8 @@ class GravadorManager(private val contexto: Context) {
                 destroy()
             }
             speechRecognizer = null
+            // limpa instância ativa
+            if (instanciaAtiva === this) instanciaAtiva = null
             Timber.i("SpeechRecognizer parado")
         } catch (e: Exception) {
             Timber.e(e, "Erro ao parar SpeechRecognizer")

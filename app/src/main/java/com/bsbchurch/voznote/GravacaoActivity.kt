@@ -124,9 +124,7 @@ class GravacaoActivity : AppCompatActivity() {
             }
         }
 
-        binding.fabNotas.setOnClickListener {
-            startActivity(Intent(this, NotasActivity::class.java))
-        }
+        // Removido botão de microfone desta tela conforme solicitado
     }
 
     private fun inicializarDepoisPermissao() {

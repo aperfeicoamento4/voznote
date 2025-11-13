@@ -50,11 +50,12 @@ class NotasAdapter(
             Timber.w(e, "Erro ao aplicar cor de fundo")
         }
 
-        // Mostrar info de alarme se presente
+        // Mostrar info de alarme se presente (formato dd-MM-yyyy HH:mm)
         if (nota.alarmeMillis != null && nota.alarmeMillis!! > 0) {
             val cal = java.util.Calendar.getInstance()
             cal.timeInMillis = nota.alarmeMillis!!
-            val txt = String.format(java.util.Locale.getDefault(), "🔔 %1\$tF %1\$tR", cal)
+            val sdf = java.text.SimpleDateFormat("dd-MM-yyyy HH:mm", java.util.Locale.getDefault())
+            val txt = "🔔 ${sdf.format(java.util.Date(cal.timeInMillis))}"
             holder.alarmInfo.text = txt
             holder.alarmInfo.visibility = View.VISIBLE
         } else {
@@ -68,7 +69,6 @@ class NotasAdapter(
             popup.menu.add("Configurar Alarme")
             popup.setOnMenuItemClickListener { item: MenuItem ->
                 when (item.title.toString()) {
-                    "Editar" -> listener.onEditar(nota)
                     "Excluir" -> listener.onExcluir(nota)
                     "Configurar Alarme" -> listener.onConfigurarAlarme(nota)
                 }

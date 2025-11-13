@@ -8,10 +8,42 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:background="@color/black"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/textTituloNotas"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Minhas Notas"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/btnConfig"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="#000000"
+                android:padding="6dp"
+                android:src="@drawable/ic_settings"
+                android:tint="@android:color/white"
+                android:contentDescription="Configurações" />
+
+        </LinearLayout>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerNotas"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:paddingTop="56dp"
             android:padding="8dp" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

@@ -48,6 +48,15 @@ class NotasActivity : AppCompatActivity(), NotasAdapter.Callback {
         binding.recyclerNotas.layoutManager = LinearLayoutManager(this)
         binding.recyclerNotas.adapter = adapter
 
+        // Ação do botão de configurações (ainda sem tela específica)
+        try {
+            binding.btnConfig.setOnClickListener {
+                Toast.makeText(this, "Configurações (em breve)", Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: Exception) {
+            Timber.w(e, "btnConfig não encontrado no layout")
+        }
+
         val touchHelper = ItemTouchHelper(object : ItemTouchHelper.Callback() {
             override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
                 val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
@@ -82,6 +91,12 @@ class NotasActivity : AppCompatActivity(), NotasAdapter.Callback {
         super.onResume()
         // Recarregar notas ao voltar para a tela para refletir edições
         carregarNotas()
+        // Garantir que qualquer reconhecimento ativo seja parado ao entrar na tela de notas
+        try {
+            com.bsbchurch.voznote.record.GravadorManager.pararGlobal()
+        } catch (e: Exception) {
+            Timber.w(e, "Erro ao parar reconhecimento global ao entrar em NotasActivity")
+        }
     }
 
     private fun carregarNotas() {
