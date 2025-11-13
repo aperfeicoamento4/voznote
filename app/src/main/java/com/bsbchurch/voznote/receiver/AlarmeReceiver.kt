@@ -47,13 +47,15 @@ class AlarmeReceiver : BroadcastReceiver() {
             nm.createNotificationChannel(channel)
         }
 
-        // Ao tocar, abrir a lista de notas
-        val openIntent = Intent(context, NotasActivity::class.java).apply {
+        // Preparar full-screen intent para mostrar janela grande do alarme
+        val fullIntent = Intent(context, AlarmeActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             putExtra("notaId", notaId)
+            putExtra("texto", texto)
         }
-        val pending = PendingIntent.getActivity(context, notaId, openIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val fullPending = PendingIntent.getActivity(context, notaId, fullIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
+        // Notificação tradicional (para aparecer na barra) com full-screen intent
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_mic)
             .setContentTitle("Lembrete: VozNote")
@@ -61,14 +63,26 @@ class AlarmeReceiver : BroadcastReceiver() {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setAutoCancel(true)
-            .setContentIntent(pending)
-        // Para Android < O, garantir som padrão
+            .setContentIntent(fullPending)
+            .setFullScreenIntent(fullPending, true)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+
+        // Para Android < O, garantir som padrão (usar som de alarme)
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O) {
-            builder.setDefaults(android.app.Notification.DEFAULT_ALL)
+            val alarmUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_ALARM)
+            builder.setSound(alarmUri)
+            builder.setDefaults(android.app.Notification.DEFAULT_LIGHTS)
         }
 
         with(NotificationManagerCompat.from(context)) {
             notify(notaId.takeIf { it != 0 } ?: System.currentTimeMillis().toInt(), builder.build())
+        }
+
+        // Também tentar iniciar Activity diretamente (fallback) para garantir que a janela apareça
+        try {
+            context.startActivity(fullIntent)
+        } catch (e: Exception) {
+            Timber.w(e, "Não foi possível iniciar AlarmeActivity diretamente, confiando no full-screen intent")
         }
     }
 }

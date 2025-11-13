@@ -30,6 +30,14 @@
         <!-- Receiver para Alarmes -->
         <receiver android:name="com.bsbchurch.voznote.receiver.AlarmeReceiver" />
 
+        <!-- Activity exibida quando um alarme dispara (aparece sobre a lockscreen) -->
+        <activity
+            android:name="com.bsbchurch.voznote.receiver.AlarmeActivity"
+            android:exported="false"
+            android:showOnLockScreen="true"
+            android:turnScreenOn="true"
+            android:excludeFromRecents="true" />
+
     </application>
 
 </manifest>
