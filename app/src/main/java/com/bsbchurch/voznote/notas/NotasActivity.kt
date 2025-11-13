@@ -175,7 +175,32 @@ class NotasActivity : AppCompatActivity(), NotasAdapter.Callback {
             .setTitle("Excluir nota")
             .setMessage("Confirma exclusão dessa nota?")
             .setPositiveButton("Excluir") { _, _ ->
-                lifecycleScope.launch { repo.deletar(nota); carregarNotas() }
+                lifecycleScope.launch {
+                    try {
+                        // cancelar alarme se havia sido agendado
+                        nota.alarmeMillis?.let {
+                            try {
+                                val am = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                                val intent = AndroidIntent(this@NotasActivity, com.bsbchurch.voznote.receiver.AlarmeReceiver::class.java).apply {
+                                    putExtra("notaId", nota.id)
+                                    putExtra("texto", nota.texto)
+                                }
+                                val pending = PendingIntent.getBroadcast(this@NotasActivity, nota.id, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                                am.cancel(pending)
+                                // também remover notificação pendente, se houver
+                                try {
+                                    val nm = getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+                                    nm.cancel(nota.id)
+                                } catch (_: Exception) { }
+                            } catch (e: Exception) {
+                                Timber.w(e, "Erro ao cancelar alarme para nota %s", nota.id)
+                            }
+                        }
+                    } finally {
+                        repo.deletar(nota)
+                        carregarNotas()
+                    }
+                }
             }
             .setNegativeButton("Cancelar", null)
             .show()
