@@ -21,7 +21,8 @@ class NotasAdapter(
     private val contexto: Context,
     private val lista: MutableList<Nota>,
     private val listener: Callback,
-    private var mostrarBordas: Boolean = false
+    private var mostrarBordas: Boolean = false,
+    private var arredondamentoFlag: Boolean = false
 ) : RecyclerView.Adapter<NotasAdapter.NotaViewHolder>() {
 
     interface Callback {
@@ -48,7 +49,8 @@ class NotasAdapter(
         try {
             // Usar um drawable para permitir bordas quando habilitado
             val gd = android.graphics.drawable.GradientDrawable()
-            gd.cornerRadius = 12 * contexto.resources.displayMetrics.density
+            val corner = if (arredondamentoFlag) 12 * contexto.resources.displayMetrics.density else 0f
+            gd.cornerRadius = corner
             gd.setColor(nota.corFundo)
             if (mostrarBordas) {
                 try {
@@ -166,6 +168,11 @@ class NotasAdapter(
 
     fun setMostrarBordas(mostrar: Boolean) {
         mostrarBordas = mostrar
+        notifyDataSetChanged()
+    }
+
+    fun setArredondamento(habilitado: Boolean) {
+        arredondamentoFlag = habilitado
         notifyDataSetChanged()
     }
 

@@ -1,2 +1,5 @@
-ParseError at [row,col]:[17,57]
-Message: http://www.w3.org/TR/1999/REC-xml-names-19990114#AttributePrefixUnbound?TextView&app:layout_constraintTop_toTopOf&app
+> Task :app:compileDebugKotlin FAILED
+e: file:///C:/Users/P_7124/Documents/projetos/notaVOZ/app/src/main/java/com/bsbchurch/voznote/notas/NotasActivity.kt:46:59 Unresolved reference: Context
+e: file:///C:/Users/P_7124/Documents/projetos/notaVOZ/app/src/main/java/com/bsbchurch/voznote/notas/NotasActivity.kt:96:64 Unresolved reference: Context
+e: file:///C:/Users/P_7124/Documents/projetos/notaVOZ/app/src/main/java/com/bsbchurch/voznote/notas/NotasActivity.kt:218:35 Unresolved reference: Context
+

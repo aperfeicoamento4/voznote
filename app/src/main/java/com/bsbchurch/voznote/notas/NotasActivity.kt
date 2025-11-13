@@ -22,7 +22,6 @@ import java.util.*
 import android.content.Context
 import android.app.AlarmManager
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent as AndroidIntent
 import com.bsbchurch.voznote.receiver.AlarmeReceiver
 
@@ -47,7 +46,8 @@ class NotasActivity : AppCompatActivity(), NotasAdapter.Callback {
 
         val prefs = getSharedPreferences("voznote_prefs", Context.MODE_PRIVATE)
         val mostrarBordas = prefs.getBoolean("pref_bordas", false)
-        adapter = NotasAdapter(this, mutableListOf(), this, mostrarBordas)
+        val arredondamento = prefs.getBoolean("pref_arredondamento", false)
+        adapter = NotasAdapter(this, mutableListOf(), this, mostrarBordas, arredondamento)
         binding.recyclerNotas.layoutManager = LinearLayoutManager(this)
         binding.recyclerNotas.adapter = adapter
 
@@ -97,7 +97,9 @@ class NotasActivity : AppCompatActivity(), NotasAdapter.Callback {
         try {
             val prefs2 = getSharedPreferences("voznote_prefs", Context.MODE_PRIVATE)
             val mostrar = prefs2.getBoolean("pref_bordas", false)
+            val arred = prefs2.getBoolean("pref_arredondamento", false)
             adapter.setMostrarBordas(mostrar)
+            adapter.setArredondamento(arred)
         } catch (e: Exception) {
             Timber.w(e, "Erro ao aplicar pref de bordas")
         }

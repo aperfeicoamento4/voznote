@@ -15,6 +15,7 @@ class ConfiguracoesActivity : AppCompatActivity() {
     private lateinit var binding: ActivityConfiguracoesBinding
     private val PREFS = "voznote_prefs"
     private val KEY_BORDAS = "pref_bordas"
+    private val KEY_ARREDONDAMENTO = "pref_arredondamento"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,16 +27,26 @@ class ConfiguracoesActivity : AppCompatActivity() {
         val prefs = getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val habilitado = prefs.getBoolean(KEY_BORDAS, false)
 
-        // se existir switch no layout, ligar ao pref
-        val sw = try { findViewById<SwitchCompat>(R.id.switchBordas) } catch (e: Exception) { null }
-        if (sw != null) {
-            sw.isChecked = habilitado
-            sw.setOnCheckedChangeListener { _, checked ->
+        // ligar switch via view binding
+        try {
+            binding.switchBordas.isChecked = habilitado
+            binding.switchBordas.setOnCheckedChangeListener { _, checked ->
                 prefs.edit().putBoolean(KEY_BORDAS, checked).apply()
             }
-        } else {
-            // fallback: mostrar mensagem
-            binding.textConfig.text = "Opções: Bordas nas caixas de notas (toggle)." 
+        } catch (e: Exception) {
+            Timber.w(e, "switchBordas não encontrado no layout; usando fallback text")
+            binding.textConfig.text = "Opções: Bordas nas caixas de notas (toggle)."
+        }
+
+        // Arredondamento: por padrão desabilitado
+        try {
+            val arred = prefs.getBoolean(KEY_ARREDONDAMENTO, false)
+            binding.switchArredondamento.isChecked = arred
+            binding.switchArredondamento.setOnCheckedChangeListener { _, checked ->
+                prefs.edit().putBoolean(KEY_ARREDONDAMENTO, checked).apply()
+            }
+        } catch (e: Exception) {
+            Timber.w(e, "switchArredondamento não encontrado no layout; ignorando")
         }
     }
 }
